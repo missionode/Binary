@@ -129,9 +129,13 @@
         
         <div class="space-y-4">
             <div class="space-y-2">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Hugging Face Token</label>
-                <input id="api-key-input" type="password" placeholder="hf_..." class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
-                <p class="text-[10px] text-slate-400">Your token is stored locally. Ensure it has 'Read' permissions.</p>
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Gemini API Key</label>
+                <input id="api-key-input" type="password" placeholder="Enter Gemini Key" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+            </div>
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Google Maps API Key</label>
+                <input id="maps-key-input" type="password" placeholder="Enter Maps Key (Optional)" class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+                <p class="text-[10px] text-slate-400">Enables business-specific challenges (e.g., Cafe names).</p>
             </div>
         </div>
 
@@ -163,7 +167,7 @@
 <script src="game.js"></script>
 <script>
     function checkApiKey() {
-        const key = localStorage.getItem('binary_hf_token');
+        const key = localStorage.getItem('binary_gemini_key');
         const btn = document.getElementById('main-action-btn');
         
         if (key && key.trim().length > 0) {
@@ -183,9 +187,32 @@
     checkApiKey();
 
     function handleMainAction() {
-        const key = localStorage.getItem('binary_hf_token');
+        const key = localStorage.getItem('binary_gemini_key');
         if (key && key.trim().length > 0) {
-            startGame();
+            // Request Location Permission Early
+            if (navigator.geolocation) {
+                // Show a temporary visual cue?
+                const btn = document.getElementById('main-action-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `INITIALIZING GPS... <span class="material-icons animate-spin">sync</span>`;
+                
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        // Success: Save basic coords for later use or just warm up the permission
+                        // We will actually fetch context in aiscan.html, but permission is now granted.
+                        console.log("Location access granted.");
+                        startGame();
+                    }, 
+                    (err) => {
+                        console.warn("Location access denied or failed.", err);
+                        // Continue anyway
+                        startGame();
+                    },
+                    { timeout: 4000 }
+                );
+            } else {
+                startGame();
+            }
         } else {
             toggleSettings();
         }
@@ -201,8 +228,9 @@
             modal.classList.remove('opacity-0', 'pointer-events-none');
             card.classList.remove('scale-95');
             card.classList.add('scale-100');
-            // Load existing key
-            document.getElementById('api-key-input').value = localStorage.getItem('binary_hf_token') || '';
+            // Load existing keys
+            document.getElementById('api-key-input').value = localStorage.getItem('binary_gemini_key') || '';
+            document.getElementById('maps-key-input').value = localStorage.getItem('binary_maps_key') || '';
         } else {
             // Close
             modal.classList.add('opacity-0', 'pointer-events-none');
@@ -212,9 +240,13 @@
     }
 
     function saveSettings() {
-        const key = document.getElementById('api-key-input').value.trim();
-        if (key) {
-            localStorage.setItem('binary_hf_token', key);
+        const geminiKey = document.getElementById('api-key-input').value.trim();
+        const mapsKey = document.getElementById('maps-key-input').value.trim();
+        
+        if (geminiKey) {
+            localStorage.setItem('binary_gemini_key', geminiKey);
+            localStorage.setItem('binary_maps_key', mapsKey); // Can be empty
+            
             // Visual feedback
             const btn = document.querySelector('#settings-card > button');
             const originalText = btn.innerText;
@@ -232,7 +264,7 @@
                 toggleSettings();
             }, 1000);
         } else {
-             alert("Please enter a valid Token.");
+             alert("Please enter at least a Gemini API Key.");
         }
     }
 
