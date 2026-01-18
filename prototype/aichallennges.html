@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Binary - AI Challenges</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&amp;family=Rajdhani:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="tailwind.js"></script>
+<script>
+    function initTailwind() {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                  extend: {
+                    colors: {
+                      primary: "#00FF88", // The vibrant neon green from the logo
+                      "background-light": "#F8FAFC",
+                      "background-dark": "#0A0C10",
+                      "card-dark": "#161B22",
+                      "accent-green": "#00FF88"
+                    },
+                    fontFamily: {
+                      display: ["Rajdhani", "sans-serif"],
+                      sans: ["Outfit", "sans-serif"],
+                    },
+                    borderRadius: {
+                      DEFAULT: "18px",
+                    },
+                    boxShadow: {
+                        'neon': '0 0 15px rgba(0, 255, 136, 0.3)',
+                        'neon-strong': '0 0 25px rgba(0, 255, 136, 0.5)',
+                    }
+                  },
+                },
+            };
+        } else {
+            setTimeout(initTailwind, 50);
+        }
+    }
+    initTailwind();
+</script>
+<style>
+        .custom-checkbox:checked {
+            background-color: #00FF88;
+            border-color: #00FF88;
+            box-shadow: 0 0 10px #00FF88;
+        }
+        .arcade-gradient {
+            background: linear-gradient(180deg, rgba(0,255,136,0.1) 0%, rgba(0,0,0,0) 100%);
+        }
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-sans text-slate-900 dark:text-slate-100 min-h-screen flex flex-col antialiased">
+<header class="sticky top-0 z-50 px-6 pt-12 pb-6 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
+<div class="flex items-center justify-between">
+<button class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">arrow_back_ios_new</span>
+</button>
+<div class="flex items-center gap-2">
+    <img alt="Binary Logo" class="h-8 w-auto filter drop-shadow-[0_0_8px_rgba(0,255,136,0.4)] dark:hidden" src="../Assets/logo/logo mark light.png"/>
+    <img alt="Binary Logo" class="h-8 w-auto filter drop-shadow-[0_0_8px_rgba(0,255,136,0.4)] hidden dark:block" src="../Assets/logo/logo mark dark.png"/>
+</div>
+<button class="p-2 -mr-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+<div class="mt-6">
+<h1 class="font-display text-4xl font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                AI Challenges
+            </h1>
+<p class="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium tracking-wide flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-primary animate-pulse shadow-neon"></span>
+                PHASE 1: SYNCHRONIZATION
+            </p>
+</div>
+</header>
+<main class="flex-1 px-6 pb-32 overflow-y-auto scroll-hide">
+<div class="space-y-4" id="challenges-container">
+    <!-- Dynamic Content injected by game.js -->
+</div>
+<div class="mt-8 mb-4 p-4 rounded-xl bg-primary/10 border border-primary/20 dark:bg-primary/5">
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs font-display font-bold uppercase text-primary tracking-widest">Progress</span>
+<span class="text-xs font-bold text-primary" id="progress-text">0/5 COMPLETED</span>
+</div>
+<div class="h-1.5 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary transition-all duration-500 shadow-neon" id="progress-bar" style="width: 0%"></div>
+</div>
+</div>
+</main>
+<div class="fixed bottom-0 left-0 right-0 p-6 pb-10 bg-gradient-to-t from-background-light dark:from-background-dark via-background-light dark:via-background-dark to-transparent">
+<button class="w-full py-5 rounded-2xl font-display text-xl font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all duration-500 disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed bg-emerald-400 text-black shadow-neon-strong active:scale-95 group overflow-hidden relative" disabled="" id="final-toss-btn" onclick="window.location.href='finaltoss.html'">
+<span class="relative z-10">Final Toss</span>
+<span class="material-symbols-outlined relative z-10 group-hover:translate-x-1 transition-transform">casino</span>
+<div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+</div>
+<script src="game.js?v=3"></script>
+<script>
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+            const total = checkboxes.length;
+            const percentage = (checkedCount / total) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const finalTossBtn = document.getElementById('final-toss-btn');
+            progressBar.style.width = `${percentage}%`;
+            progressText.innerText = `${checkedCount}/${total} COMPLETED`;
+            if (checkedCount === total) {
+                finalTossBtn.disabled = false;
+                finalTossBtn.classList.add('animate-bounce');
+                setTimeout(() => finalTossBtn.classList.remove('animate-bounce'), 1000);
+            } else {
+                finalTossBtn.disabled = true;
+            }
+        }
+
+        // Init: Generate Content
+        const container = document.getElementById('challenges-container');
+        const tasks = GameEngine.getAIChallenges(); // Now returns 10 items with 'assignee'
+        const players = GameEngine.getPlayers();
+
+        // Header Badge
+        const isAI = localStorage.getItem('binary_gemini_key') ? true : false; // Simple heuristic
+        const badgeHTML = `
+            <div class="mb-6 flex justify-center">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${isAI ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50' : 'bg-slate-700 text-slate-400 border border-slate-600'}">
+                    ${isAI ? '✨ AI-Generated Protocol' : 'Standard Protocol'}
+                </span>
+            </div>
+        `;
+        container.innerHTML = badgeHTML;
+
+        // Group by Player
+        const p1Tasks = tasks.filter(t => t.assignee === 'P1' || !t.assignee); // Fallback to P1 if missing
+        const p2Tasks = tasks.filter(t => t.assignee === 'P2');
+
+        const renderTask = (task) => `
+            <label class="group relative block transition-all duration-300 transform active:scale-[0.98]">
+                <input class="peer hidden" type="checkbox" onchange="updateProgress()">
+                <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-card-dark transition-all duration-300 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/5 group-hover:border-emerald-500/30 flex items-center justify-between shadow-sm">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                            <span class="material-icons text-xl">${task.icon || 'star'}</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-sm leading-tight text-slate-900 dark:text-white">${task.title}</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-tight mt-0.5">${task.desc}</p>
+                        </div>
+                    </div>
+                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center peer-checked:bg-emerald-500 peer-checked:border-emerald-500 transition-colors">
+                        <span class="material-icons text-white text-xs scale-0 peer-checked:scale-100 transition-transform">check</span>
+                    </div>
+                </div>
+            </label>`;
+
+        // Render P1 Section
+        container.innerHTML += `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 mt-2">Challenges for ${players.p1}</h3>`;
+        container.innerHTML += `<div class="space-y-3 mb-6">${p1Tasks.map(renderTask).join('')}</div>`;
+
+        // Render P2 Section
+        if (p2Tasks.length > 0) {
+            container.innerHTML += `<h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 border-t border-slate-800 pt-6">Challenges for ${players.p2}</h3>`;
+            container.innerHTML += `<div class="space-y-3">${p2Tasks.map(renderTask).join('')}</div>`;
+        }
+    </script>
+
+</body></html>

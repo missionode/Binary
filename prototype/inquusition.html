@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Inquisition - Binary Game</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script src="tailwind.js"></script>
+<script>
+    function initTailwind() {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#10B981", // The neon green from the logo
+                            sky: "#0EA5E9",
+                            rose: "#F43F5E",
+                            "background-light": "#F9FAFB",
+                            "background-dark": "#0A0A0A",
+                        },
+                        fontFamily: {
+                            display: ["Outfit", "sans-serif"],
+                            sans: ["Inter", "sans-serif"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "1rem",
+                            '2xl': '1.5rem',
+                            '3xl': '2rem',
+                        },
+                        animation: {
+                            'fade-in': 'fadeIn 0.5s ease-out',
+                        },
+                        keyframes: {
+                            fadeIn: {
+                                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                                '100%': { opacity: '1', transform: 'translateY(0)' },
+                            }
+                        }
+                    },
+                },
+            };
+        } else {
+            setTimeout(initTailwind, 50);
+        }
+    }
+    initTailwind();
+</script>
+<style>
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        }.neon-glow {
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans min-h-screen flex flex-col items-center justify-between overflow-y-auto">
+<header class="w-full px-6 pt-12 pb-4 flex justify-between items-center">
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-white/80 dark:bg-zinc-800/80 shadow-sm">
+<span class="material-icons-round text-slate-600 dark:text-slate-400">close</span>
+</button>
+<div class="flex items-center gap-2">
+    <img alt="Binary Logo" class="h-8 w-auto opacity-80 dark:hidden" src="../Assets/logo/logo mark light.png"/>
+    <img alt="Binary Logo" class="h-8 w-auto opacity-80 hidden dark:block" src="../Assets/logo/logo mark dark.png"/>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-white/80 dark:bg-zinc-800/80 shadow-sm">
+<span class="material-icons-round text-slate-600 dark:text-slate-400">help_outline</span>
+</button>
+</header>
+<div class="mt-4 flex flex-col items-center animate-fade-in">
+<div class="px-4 py-1.5 rounded-full bg-sky/10 dark:bg-sky/20 border border-sky/20 mb-2">
+<span class="text-xs font-bold uppercase tracking-widest text-sky">Current Turn</span>
+</div>
+<h2 class="text-2xl font-display font-bold text-sky dark:text-sky/90" id="question-header">
+            Question for Alex
+        </h2>
+</div>
+<main class="flex-1 w-full max-w-md px-6 py-8 flex items-center justify-center relative">
+<div class="absolute w-[80%] h-[60%] bg-slate-200 dark:bg-zinc-800 rounded-3xl rotate-3 translate-y-4 opacity-50 pointer-events-none"></div>
+<div class="absolute w-[80%] h-[60%] bg-slate-100 dark:bg-zinc-900 rounded-3xl -rotate-2 translate-y-2 opacity-80 pointer-events-none"></div>
+<div class="relative w-full min-h-[50vh] bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl shadow-black/10 dark:shadow-black/40 flex flex-col p-8 border border-slate-100 dark:border-zinc-800">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+<span class="material-icons-round text-primary text-3xl">psychology</span>
+</div>
+<div class="text-right">
+<span class="block text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Category</span>
+<span class="text-sm font-semibold text-slate-600 dark:text-slate-300" id="question-category">Intimacy &amp; Depth</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<p class="text-2xl sm:text-3xl font-display font-bold leading-tight text-slate-800 dark:text-slate-50" id="question-text">
+                    What is one memory with your partner that you'd love to relive for the first time?
+                </p>
+</div>
+<div class="mt-8 flex items-center justify-between opacity-30">
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
+</div>
+<span class="text-xs font-mono font-bold tracking-widest">BQ-402</span>
+</div>
+</div>
+</main>
+<footer class="w-full max-w-md px-8 pt-4 pb-12 flex flex-col gap-4">
+<button id="next-btn" class="w-full py-5 active:scale-95 transition-all rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/20 neon-glow" style="background-color: #10b981 !important; color: white !important;">
+<span class="text-white font-display font-bold text-lg tracking-wide uppercase">Answered. Next.</span>
+<span class="material-icons-round text-white">arrow_forward</span>
+</button>
+<div class="flex justify-center gap-8 pt-2">
+<button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-10 h-10 rounded-full border border-slate-300 dark:border-zinc-700 flex items-center justify-center">
+<span class="material-icons-round text-xl">refresh</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest">Re-roll</span>
+</button>
+<button class="flex flex-col items-center gap-1 opacity-60 hover:opacity-100 transition-opacity">
+<div class="w-10 h-10 rounded-full border border-slate-300 dark:border-zinc-700 flex items-center justify-center">
+<span class="material-icons-round text-xl">ios_share</span>
+</div>
+<span class="text-[10px] font-bold uppercase tracking-widest">Share</span>
+</button>
+</div>
+</footer>
+<div class="fixed right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 opacity-40">
+<div class="w-1 h-4 bg-primary rounded-full"></div>
+<div class="w-1 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+<div class="w-1 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+<div class="w-1 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+<div class="w-1 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+</div>
+
+<!-- Phase Complete Overlay -->
+<div id="phase-complete-overlay" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-500">
+    <div class="max-w-xs w-full bg-white dark:bg-zinc-900 rounded-3xl p-8 text-center shadow-2xl border border-white/10 transform scale-95 transition-transform duration-500" id="phase-card">
+        <div class="w-16 h-16 bg-primary/20 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-icons-round text-3xl">psychology_alt</span>
+        </div>
+        <h2 class="text-2xl font-display font-bold mb-2">Phase Cleared!</h2>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mb-8">Answers locked in. Ready for the next level? Prepare for the AI Synchronization scan.</p>
+        <button onclick="window.location.href='aiscan.html'" style="background-color: #10b981 !important; color: white !important;" class="w-full py-4 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all">
+            START NEXT LEVEL
+        </button>
+    </div>
+</div>
+
+<script src="game.js"></script>
+<script>
+    // Init Quiz Queue
+    // We store the full queue in memory or recreate it. 
+    // Ideally, GameEngine tracks the "current question index" persistently.
+    // For this prototype, we'll generate it and assume sequential play.
+    
+    // We need to know which question we are on.
+    let quizIndex = parseInt(localStorage.getItem('binary_quiz_index') || 0);
+    const quizQueue = GameEngine.generateQuizQueue(); // [{player: 'Alex', question: {...}}, ...]
+    
+    // Total rounds = 6 (3 per player)
+    const totalQuestions = quizQueue.length;
+
+    function loadNextQuestion() {
+        if (quizIndex >= totalQuestions) {
+             // Should have been handled, but just in case
+             finishPhase();
+             return;
+        }
+
+        const currentTurn = quizQueue[quizIndex];
+        
+        document.getElementById('question-header').innerText = `Question for ${currentTurn.player}`;
+        document.getElementById('question-text').innerText = currentTurn.question.text;
+        document.getElementById('question-category').innerText = currentTurn.question.category;
+        
+        // Update button text logic
+        const btnText = document.querySelector('#next-btn span.font-display');
+        if (quizIndex < totalQuestions - 1) {
+             if(btnText) btnText.innerText = "NEXT QUESTION";
+        } else {
+             if(btnText) btnText.innerText = "FINISH PHASE";
+        }
+    }
+    
+    function finishPhase() {
+        // Reset for next game/playthrough
+        localStorage.setItem('binary_quiz_index', 0);
+        
+        // Show Overlay
+        const overlay = document.getElementById('phase-complete-overlay');
+        const card = document.getElementById('phase-card');
+        
+        overlay.classList.remove('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+        
+        // Trigger haptic
+        if (window.navigator.vibrate) window.navigator.vibrate(50);
+    }
+
+    loadNextQuestion();
+
+    // Override the Next button logic
+    const nextBtn = document.getElementById('next-btn');
+    
+    nextBtn.addEventListener('click', () => {
+        quizIndex++;
+        localStorage.setItem('binary_quiz_index', quizIndex);
+
+        if (quizIndex >= totalQuestions) {
+            finishPhase();
+        } else {
+            // Load next question with a small animation
+            document.querySelector('main').classList.add('opacity-0', 'translate-x-[-20px]');
+            setTimeout(() => {
+                loadNextQuestion();
+                document.querySelector('main').classList.remove('opacity-0', 'translate-x-[-20px]');
+                document.querySelector('main').classList.add('animate-fade-in');
+            }, 300);
+        }
+    });
+
+</script>
+</body></html>

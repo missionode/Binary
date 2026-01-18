@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Binary - AI Compatibility Scan</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="tailwind.js"></script>
+<script>
+    function initTailwind() {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                  extend: {
+                    colors: {
+                      primary: "#10b981", // emerald-500
+                      "background-light": "#f8fafc",
+                      "background-dark": "#020617",
+                    },
+                    fontFamily: {
+                      display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                      DEFAULT: "1rem",
+                    },
+                    animation: {
+                      'scan': 'scan 3s ease-in-out infinite',
+                      'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                      scan: {
+                        '0%, 100%': { transform: 'translateY(0%)', opacity: '0.2' },
+                        '50%': { transform: 'translateY(400px)', opacity: '1' },
+                      }
+                    }
+                  },
+                },
+            };
+        } else {
+            setTimeout(initTailwind, 50);
+        }
+    }
+    initTailwind();
+</script>
+<style>
+        .face-mesh {
+            background-image: radial-gradient(circle, #10b981 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col overflow-hidden">
+<div class="h-12 px-8 flex justify-between items-center w-full">
+<span class="text-sm font-semibold">9:41</span>
+<div class="flex items-center gap-1.5">
+<span class="material-icons text-sm">signal_cellular_alt</span>
+<span class="material-icons text-sm">wifi</span>
+<span class="material-icons text-sm rotate-90">battery_full</span>
+</div>
+</div>
+<nav class="flex items-center justify-between px-6 py-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+<span class="material-icons">arrow_back_ios_new</span>
+</button>
+<div class="flex items-center gap-1">
+<span class="font-extrabold text-xl tracking-tighter italic uppercase">B<span class="text-primary italic">i</span>nary</span>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+<span class="material-icons text-primary">info</span>
+</button>
+</nav>
+<main class="flex-grow flex flex-col p-4 relative">
+<div class="flex-grow relative rounded-[2.5rem] overflow-hidden bg-slate-900 shadow-2xl border-4 border-slate-200 dark:border-white/5 group">
+    <!-- Webcam Feed -->
+    <video id="webcam-feed" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]"></video>
+    <!-- Hidden Canvas for Capture -->
+    <canvas id="capture-canvas" class="hidden"></canvas>
+    
+    <!-- Fallback/Overlay -->
+    <div id="video-overlay" class="absolute inset-0 bg-cover bg-center grayscale opacity-80 mix-blend-overlay pointer-events-none" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCmH-FsP2G2YGLmR85ojtHafdPr0u6U74y1ZIe1wFaxDmiGnNfo2rOjcjLmjL_p6I6YcAkCoMQDrZm9EMU3MOcNyJY2zbPvW9bGROo5oM5VCME0C97Wf5RBT95tgY1IMPsAc-WpSwElVkzSTj5Ka2FqJHkfJoltyg4J4SFOzJIKz5Y2TNMMlp_eEJJlYAsG9deIrRYLZdrBDMytRAOvI0WwIvYjyJermj_y-874IHbVZ-RxUgiSibCVFPlXeSW2-hiWXRHSkXx8wYqS');">
+    </div>
+<div class="absolute inset-0 face-mesh opacity-20 pointer-events-none"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-80 border-2 border-primary/40 rounded-[3rem] pointer-events-none">
+<div class="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-2xl"></div>
+<div class="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-2xl"></div>
+<div class="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-2xl"></div>
+<div class="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-2xl"></div>
+<div class="absolute top-1/4 left-1/4 w-1.5 h-1.5 bg-primary rounded-full animate-pulse-fast shadow-[0_0_10px_#10b981]"></div>
+<div class="absolute top-1/4 right-1/4 w-1.5 h-1.5 bg-primary rounded-full animate-pulse-fast shadow-[0_0_10px_#10b981]"></div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></div>
+<div class="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-primary rounded-full animate-pulse-fast shadow-[0_0_10px_#10b981]"></div>
+<div class="absolute bottom-1/4 right-1/3 w-1.5 h-1.5 bg-primary rounded-full animate-pulse shadow-[0_0_10px_#10b981]"></div>
+</div>
+<div class="absolute top-0 left-4 right-4 h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_#10b981] animate-scan z-10"></div>
+<div class="absolute top-8 left-8 flex flex-col gap-2 pointer-events-none">
+<div class="flex items-center gap-2 text-[10px] font-mono text-primary/80 uppercase tracking-widest">
+<span class="w-2 h-2 rounded-full bg-primary animate-ping"></span>
+                    Live Sync Active
+                </div>
+<div class="text-[9px] font-mono text-white/40">FR: 60FPS</div>
+<div class="text-[9px] font-mono text-white/40">LAT: 12MS</div>
+</div>
+<!-- Guided Scan Overlay -->
+<div id="scan-overlay" class="absolute inset-0 z-20 flex flex-col items-center justify-between bg-black/20 backdrop-blur-[1px] transition-opacity duration-500">
+    <!-- Top Instructions -->
+    <div class="w-full pt-12 px-8 text-center bg-gradient-to-b from-black/80 to-transparent pb-12">
+        <h2 id="overlay-title" class="text-2xl font-display font-bold text-white mb-2 drop-shadow-lg">Initialize Scan</h2>
+        <p id="overlay-desc" class="text-white font-bold text-sm drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] uppercase tracking-wider">Align your face within the frame.</p>
+    </div>
+
+    <!-- Bottom Action -->
+    <div class="w-full pb-16 px-8 bg-gradient-to-t from-black/80 to-transparent pt-12">
+        <button id="scan-action-btn" class="w-full py-5 bg-emerald-500 hover:bg-emerald-600 text-white font-display font-black rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.4)] active:scale-95 transition-all uppercase tracking-widest">
+            START SCAN
+        </button>
+    </div>
+</div>
+
+<!-- Crosshair / Alignment Guide -->
+<div id="crosshair" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none transition-opacity duration-300">
+    <div class="relative w-64 h-80 border border-emerald-500/30 rounded-[3rem]">
+        <!-- Corners -->
+        <div class="absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 border-emerald-500 rounded-tl-3xl shadow-[0_0_15px_#10b981]"></div>
+        <div class="absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 border-emerald-500 rounded-tr-3xl shadow-[0_0_15px_#10b981]"></div>
+        <div class="absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 border-emerald-500 rounded-bl-3xl shadow-[0_0_15px_#10b981]"></div>
+        <div class="absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 border-emerald-500 rounded-br-3xl shadow-[0_0_15px_#10b981]"></div>
+        
+        <!-- Center Cross -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-px bg-emerald-500/50"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-8 w-px bg-emerald-500/50"></div>
+    </div>
+</div>
+
+<!-- Countdown Overlay (Hidden) -->
+<div id="countdown-overlay" class="absolute inset-0 z-10 flex items-center justify-center pointer-events-none hidden">
+    <span id="countdown-text" class="text-9xl font-black text-white drop-shadow-2xl animate-pulse">3</span>
+</div>
+
+<div class="absolute bottom-12 left-1/2 -translate-x-1/2 text-center">
+<div class="px-4 py-1.5 ios-blur bg-black/60 border border-emerald-500/50 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+<span class="text-emerald-400 text-xs font-bold tracking-[0.2em] uppercase" style="text-shadow: 0 0 8px rgba(52, 211, 153, 0.8);">Target Locked</span>
+</div>
+</div>
+</div>
+</main>
+<footer class="px-8 pt-4 pb-12 flex flex-col gap-6 bg-background-light dark:bg-background-dark">
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<div class="space-y-1">
+<h2 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">AI Compatibility Scan</h2>
+<p class="text-sm font-medium animate-pulse">Analyzing Facial Micro-expressions...</p>
+</div>
+<span id="scan-percentage" class="text-2xl font-black text-primary italic">0%</span>
+</div>
+<div class="relative w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+<div id="scan-bar" class="absolute top-0 left-0 h-full bg-primary rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transition-all duration-500 ease-out" style="width: 0%;">
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]"></div>
+</div>
+</div>
+</div>
+<div class="flex gap-4">
+<div class="flex-1 p-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Emotional Bias</span>
+<span id="scan-bias" class="text-lg font-bold">Scanning...</span>
+</div>
+<div class="flex-1 p-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-1">
+<span class="text-[10px] text-slate-400 uppercase font-bold tracking-tight">Pulse Rate</span>
+<span class="text-lg font-bold text-rose-500">Elevated</span>
+</div>
+</div>
+</footer>
+<div class="flex justify-center pb-2">
+<div class="w-32 h-1.5 bg-slate-400/30 dark:bg-white/20 rounded-full"></div>
+</div>
+<style>
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+<script src="game.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('webcam-feed');
+        const canvas = document.getElementById('capture-canvas');
+        const overlay = document.getElementById('scan-overlay');
+        const title = document.getElementById('overlay-title');
+        const desc = document.getElementById('overlay-desc');
+        const btn = document.getElementById('scan-action-btn');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const countdownText = document.getElementById('countdown-text');
+        const crosshair = document.getElementById('crosshair');
+        const apiKey = localStorage.getItem('binary_gemini_key');
+        
+        const players = GameEngine.getPlayers();
+        let currentStep = 0; 
+        let p1Data = null;
+        let p2Data = null;
+        let envData = null;
+
+        // --- FUNCTIONS ---
+
+        async function startCamera(facingMode = 'user') {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            try {
+                const constraints = {
+                    video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } }
+                };
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = stream;
+                if (facingMode === 'user') video.classList.add('scale-x-[-1]');
+                else video.classList.remove('scale-x-[-1]');
+                document.getElementById('video-overlay').classList.add('opacity-0');
+            } catch (err) {
+                console.error("Camera error:", err);
+                desc.innerText = "Camera failed. Using simulation.";
+            }
+        }
+
+        function startCountdown(callback) {
+            overlay.classList.add('opacity-0', 'pointer-events-none');
+            countdownOverlay.classList.remove('hidden');
+            let count = 3;
+            countdownText.innerText = count;
+            const interval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownText.innerText = count;
+                    if (window.navigator.vibrate) window.navigator.vibrate(50);
+                } else {
+                    clearInterval(interval);
+                    countdownOverlay.classList.add('hidden');
+                    document.body.classList.add('bg-white');
+                    setTimeout(() => document.body.classList.remove('bg-white'), 100);
+                    if (window.navigator.vibrate) window.navigator.vibrate(200);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        async function captureFace(stepKey) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const base64Image = canvas.toDataURL('image/jpeg').split(',')[1];
+            
+            if (stepKey === 'p1') {
+                p1Data = base64Image;
+                currentStep = 2;
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                title.innerText = `Scan: ${players.p2}`;
+                desc.innerText = `${players.p1} captured. Ready for ${players.p2}?`;
+                btn.innerText = "START SCAN";
+            } else if (stepKey === 'p2') {
+                p2Data = base64Image;
+                currentStep = 4;
+                crosshair.classList.add('opacity-0');
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                title.innerText = "Scan Surroundings";
+                desc.innerText = "Switching to back camera. Capture your environment.";
+                btn.innerText = "CAPTURE ENVIRONMENT";
+                startCamera('environment');
+            } else if (stepKey === 'env') {
+                envData = base64Image;
+                currentStep = 6;
+                performAnalysis();
+            }
+        }
+
+        async function stitchImages(img1, img2, img3) {
+            return new Promise((resolve) => {
+                const c = document.createElement('canvas');
+                const ctx = c.getContext('2d');
+                const i1 = new Image();
+                const i2 = new Image();
+                const i3 = new Image();
+                let loaded = 0;
+                const onLoad = () => {
+                    loaded++;
+                    if (loaded === 3) {
+                        c.width = i1.width + i2.width + i3.width;
+                        c.height = Math.max(i1.height, i2.height, i3.height);
+                        ctx.drawImage(i1, 0, 0);
+                        ctx.drawImage(i2, i1.width, 0);
+                        ctx.drawImage(i3, i1.width + i2.width, 0);
+                        resolve(c.toDataURL('image/jpeg', 0.8));
+                    }
+                };
+                i1.onload = onLoad; i2.onload = onLoad; i3.onload = onLoad;
+                i1.src = "data:image/jpeg;base64," + img1;
+                i2.src = "data:image/jpeg;base64," + img2;
+                i3.src = "data:image/jpeg;base64," + img3;
+            });
+        }
+
+        async function performAnalysis() {
+            overlay.classList.remove('opacity-0', 'pointer-events-none');
+            title.innerText = "AI Processing...";
+            desc.innerText = "Stitching & Analyzing...";
+            btn.classList.add('hidden');
+            document.querySelector('p.animate-pulse').innerText = "Analyzing via Llama 3.2 Vision...";
+
+            let percentage = 0;
+            let bias = "Stable";
+
+            if (apiKey && p1Data && p2Data && envData) {
+                try {
+                    const stitchedDataUrl = await stitchImages(p1Data, p2Data, envData);
+                    const systemPrompt = `You are the Game Master. Analyze this composite image (Left: P1, Center: P2, Right: Env). 1. Analyze Faces (Physiognomy). 2. Analyze Environment (Props/Safety). 3. Generate 10 CUSTOM CHALLENGES (5 for P1, 5 for P2). OUTPUT JSON ONLY: {"percentage": number, "bias": string, "challenges": [{"title":string, "desc":string, "icon":string, "assignee":"P1"|"P2"}]}`;
+                    
+                // 3. Call Hugging Face API
+                console.log("Calling HF API with token length:", apiKey.length);
+                
+                const response = await fetch("https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct", {
+                    method: "POST",
+                    mode: "cors", // Explicitly request CORS
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: "user",
+                                content: [
+                                    { type: "text", text: systemPrompt },
+                                    { type: "image_url", image_url: { url: stitchedDataUrl } }
+                                ]
+                            }
+                        ],
+                        max_tokens: 1000
+                    })
+                });
+
+                    if (!response.ok) {
+                        const errText = await response.text();
+                        throw new Error(`HF Error ${response.status}: ${errText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log("HF Raw Response:", data);
+                    
+                    let text = "";
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        text = data.choices[0].message.content;
+                    } else if (Array.isArray(data) && data[0].generated_text) {
+                         text = data[0].generated_text;
+                    } else {
+                         text = JSON.stringify(data);
+                    }
+
+                    const jsonMatch = text.match(/\{[\s\S]*\}/);
+                    if (!jsonMatch) throw new Error("No JSON found in AI response");
+                    
+                    const result = JSON.parse(jsonMatch[0]);
+                    percentage = result.percentage;
+                    bias = result.bias;
+                    if (result.challenges) GameEngine.setAIChallenges(result.challenges);
+
+                } catch (err) {
+                    console.error("API Error:", err);
+                    desc.innerText = "Error: " + err.message.substring(0, 50) + "...";
+                    const sim = GameEngine.generateScanResult();
+                    percentage = sim.percentage;
+                    bias = sim.bias;
+                }
+            } else {
+                if (!apiKey) console.warn("No API Key found.");
+                const sim = GameEngine.generateScanResult();
+                percentage = sim.percentage;
+                bias = sim.bias;
+                await new Promise(r => setTimeout(r, 2000));
+            }
+
+            localStorage.setItem('binary_match_score', percentage);
+            localStorage.setItem('binary_match_bias', bias);
+            document.getElementById('scan-percentage').innerText = percentage + "%";
+            document.getElementById('scan-bar').style.width = percentage + "%";
+            document.getElementById('scan-bias').innerText = bias;
+            title.innerText = "Scan Complete";
+            desc.innerText = `Result: ${percentage}% - ${bias}`;
+            
+            // Increased delay to 10s for debugging
+            setTimeout(() => { window.location.href = 'aichallennges.html'; }, 10000);
+        }
+
+        // --- INIT ---
+        title.innerText = `Scan: ${players.p1}`;
+        btn.onclick = () => {
+            if (currentStep === 0) startCountdown(() => captureFace('p1'));
+            else if (currentStep === 2) startCountdown(() => captureFace('p2'));
+            else if (currentStep === 4) captureFace('env');
+        };
+        startCamera('user');
+    });
+</script>
+
+</body></html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Binary - Card Draft Selection</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Outfit:wght@500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<script src="tailwind.js"></script>
+<script>
+    function initTailwind() {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                  extend: {
+                    colors: {
+                      primary: "#10b981", // Emerald 500
+                      "background-light": "#fcfcfc",
+                      "background-dark": "#0a0a0a",
+                    },
+                    fontFamily: {
+                      display: ["Outfit", "sans-serif"],
+                      sans: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                      DEFAULT: "0.75rem",
+                      "xl": "1rem",
+                      "2xl": "1.5rem",
+                    },
+                    boxShadow: {
+                        'glow': '0 0 15px -3px rgba(16, 185, 129, 0.5), 0 0 6px -2px rgba(16, 185, 129, 0.3)',
+                    }
+                  },
+                },
+            };
+        } else {
+            // Retry after 50ms
+            setTimeout(initTailwind, 50);
+        }
+    }
+    initTailwind();
+</script>
+<style>
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .ios-blur {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-sans antialiased overflow-hidden h-screen select-none">
+<div class="h-12 w-full"></div>
+<div class="max-w-md mx-auto h-full flex flex-col px-6">
+<header class="flex justify-between items-center py-4">
+<div class="flex items-baseline gap-0.5">
+<span class="font-display text-2xl font-extrabold tracking-tighter uppercase">B</span>
+<span class="font-display text-2xl font-extrabold tracking-tighter uppercase text-primary drop-shadow-[0_0_8px_rgba(16,185,129,0.4)]">i</span>
+<span class="font-display text-2xl font-extrabold tracking-tighter uppercase">NARY</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-900 flex items-center justify-center text-slate-600 dark:text-slate-400">
+<span class="material-icons-round text-xl">help_outline</span>
+</button>
+</header>
+<div class="mt-4 mb-8">
+<div class="flex items-center justify-between mb-3">
+<h1 class="text-xl font-bold tracking-tight">
+                    Player <span id="current-player" class="text-primary">Alex</span>, pick 3 cards.
+                </h1>
+<span class="text-sm font-semibold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">Draft Phase</span>
+</div>
+<div class="w-full h-1.5 bg-slate-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+<div id="progress-bar" class="h-full bg-primary w-0 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+</div>
+</div>
+<div class="card-grid flex-1 pb-24 overflow-y-auto no-scrollbar" id="card-container">
+    <!-- Cards will be injected by JS -->
+</div>
+<div class="fixed bottom-0 left-0 right-0 p-6 ios-blur bg-white/60 dark:bg-black/60 border-t border-slate-200 dark:border-zinc-800">
+<div class="max-w-md mx-auto flex gap-4">
+<button id="confirm-btn" disabled style="background-color: #10b981 !important; color: white !important;" class="flex-1 py-4 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 active:scale-95 transition-all flex items-center justify-center gap-2 opacity-30 cursor-not-allowed">
+                    CONFIRM SELECTION
+                    <span class="material-icons-round text-lg">chevron_right</span>
+</button>
+</div>
+<div class="mt-4 flex justify-center">
+<div class="w-32 h-1.5 bg-slate-300 dark:bg-zinc-700 rounded-full"></div>
+</div>
+</div>
+</div>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <script src="game.js"></script>
+    <script>
+        // Toggle dark mode based on system preference (optional for demo)
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        const players = GameEngine.getPlayers();
+        // Start with Player 1 (or whoever won the toss? user said "both players... once both choose")
+        // We will default to P1 first, then P2.
+        // Or strictly follow the toss winner first. Let's follow toss winner first.
+        const tossWinner = GameEngine.getTurn() || players.p1;
+        const secondPlayer = tossWinner === players.p1 ? players.p2 : players.p1;
+
+        let currentDrafter = tossWinner;
+        let p1Selections = []; // Indices of cards
+        let p2Selections = [];
+        let takenCards = new Set(); // Indices of cards taken by P1
+
+        const headerName = document.getElementById('current-player');
+        headerName.innerText = currentDrafter;
+
+        const cardContainer = document.getElementById('card-container');
+        const confirmBtn = document.getElementById('confirm-btn');
+        let sessionSelectedCount = 0; // Tracks current player's pick count (0-3)
+
+        // Generate 20 Cards
+        for (let i = 0; i < 20; i++) {
+            const card = document.createElement('div');
+            card.dataset.index = i; // Store ID
+            card.className = "aspect-[3/4] bg-white dark:bg-zinc-900 rounded-2xl border-2 border-slate-100 dark:border-zinc-800 shadow-sm hover:shadow-lg flex flex-col items-center justify-center relative group active:scale-95 transition-all duration-300 cursor-pointer overflow-hidden";
+            card.innerHTML = `
+                <!-- Background Overlay -->
+                <div class="absolute inset-0 bg-indigo-500/0 transition-colors duration-300"></div>
+                
+                <!-- Main Icon -->
+                <div class="main-icon transform transition-transform duration-500 group-hover:scale-110">
+                    <span class="material-icons-round text-4xl text-indigo-500/40 dark:text-indigo-400/30">style</span>
+                </div>
+                
+                <!-- Corner Tick Mark -->
+                <div class="check-mark absolute top-3 right-3 opacity-0 scale-50 transition-all duration-300">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-md">
+                        <span class="material-icons-round text-xs">check</span>
+                    </div>
+                </div>
+            `;
+
+            card.onclick = () => {
+                // If card is already taken by previous player, ignore
+                if (takenCards.has(i)) return;
+
+                const isSelected = card.classList.contains('selected');
+                const checkmark = card.querySelector('.check-mark');
+                const checkmarkCircle = checkmark.children[0];
+                const checkmarkIcon = checkmarkCircle.children[0];
+                const mainIcon = card.querySelector('.main-icon span');
+                
+                if (!isSelected && sessionSelectedCount < 3) {
+                    card.classList.add('selected', 'border-emerald-500');
+                    card.classList.remove('border-slate-100', 'dark:border-zinc-800', 'shadow-sm');
+                    
+                    // FORCE BACKGROUND
+                    card.style.backgroundColor = '#10b981'; // Emerald-500
+                    
+                    checkmark.classList.remove('opacity-0', 'scale-50');
+                    checkmark.classList.add('opacity-100', 'scale-100');
+                    
+                    // Tick circle white, check icon green
+                    checkmarkCircle.style.backgroundColor = 'white';
+                    checkmarkIcon.style.color = '#10b981'; // Explicit Green
+                    
+                    // Main Icon White
+                    mainIcon.classList.remove('text-indigo-500/40', 'dark:text-indigo-400/30');
+                    mainIcon.style.color = 'white';
+                    
+                    sessionSelectedCount++;
+                    if (currentDrafter === tossWinner) p1Selections.push(i);
+                    else p2Selections.push(i);
+
+                } else if (isSelected) {
+                    card.classList.remove('selected', 'border-emerald-500');
+                    card.classList.add('border-slate-100', 'dark:border-zinc-800', 'shadow-sm');
+                    
+                    // REVERT BACKGROUND
+                    card.style.backgroundColor = ''; 
+                    
+                    checkmark.classList.remove('opacity-100', 'scale-100');
+                    checkmark.classList.add('opacity-0', 'scale-50');
+                    
+                    // Revert colors
+                    checkmarkCircle.style.backgroundColor = '';
+                    checkmarkIcon.style.color = '';
+                    
+                    mainIcon.style.color = '';
+                    mainIcon.classList.add('text-indigo-500/40', 'dark:text-indigo-400/30');
+                    
+                    sessionSelectedCount--;
+                     if (currentDrafter === tossWinner) p1Selections = p1Selections.filter(id => id !== i);
+                     else p2Selections = p2Selections.filter(id => id !== i);
+                }
+
+                // Update Button State
+                if (sessionSelectedCount === 3) {
+                    confirmBtn.disabled = false;
+                    confirmBtn.classList.remove('opacity-30', 'cursor-not-allowed');
+                    confirmBtn.classList.add('shadow-glow');
+                    
+                    // Update Text based on phase
+                    if (currentDrafter === tossWinner) {
+                        confirmBtn.innerHTML = `NEXT: ${secondPlayer.toUpperCase()} <span class="material-icons-round text-lg">arrow_forward</span>`;
+                    } else {
+                        confirmBtn.innerHTML = `START INQUISITION <span class="material-icons-round text-lg">bolt</span>`;
+                    }
+                } else {
+                    confirmBtn.disabled = true;
+                    confirmBtn.classList.add('opacity-30', 'cursor-not-allowed');
+                    confirmBtn.classList.remove('shadow-glow');
+                    confirmBtn.innerHTML = `CONFIRM SELECTION <span class="material-icons-round text-lg">chevron_right</span>`;
+                }
+
+                // Update Progress Bar
+                const progress = (sessionSelectedCount / 3) * 100;
+                const progressBar = document.getElementById('progress-bar');
+                if(progressBar) progressBar.style.width = progress + "%";
+            };
+
+            cardContainer.appendChild(card);
+        }
+
+        confirmBtn.onclick = () => {
+            if (currentDrafter === tossWinner) {
+                // Phase 1 Complete
+                // 1. Lock the cards
+                p1Selections.forEach(id => {
+                    takenCards.add(id);
+                    // Visual lock: Scale down and fade
+                    const card = cardContainer.children[id];
+                    card.classList.add('opacity-20', 'scale-90', 'grayscale', 'cursor-not-allowed');
+                    card.onclick = null; // Disable interaction
+                });
+
+                // 2. Switch Player
+                currentDrafter = secondPlayer;
+                headerName.innerText = currentDrafter;
+                
+                // 3. Reset UI for P2
+                sessionSelectedCount = 0;
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('opacity-30', 'cursor-not-allowed');
+                confirmBtn.classList.remove('shadow-glow');
+                confirmBtn.innerHTML = `CONFIRM SELECTION <span class="material-icons-round text-lg">chevron_right</span>`;
+                document.getElementById('progress-bar').style.width = "0%";
+                
+                // Scroll top
+                cardContainer.scrollTop = 0;
+
+            } else {
+                // Phase 2 Complete -> Save & Go
+                // Determine who is P1 in the engine context (usually p1 is p1)
+                // We just save as draft_p1 (tossWinner's cards) and draft_p2 (secondPlayer's cards)
+                // The engine's generateQuizQueue will handle the interleaving.
+                GameEngine.setDraft(p1Selections, p2Selections);
+                window.location.href = 'inquusition.html';
+            }
+        };
+    </script>
+</body></html>

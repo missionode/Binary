@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Binary - Enter the Arena</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=Orbitron:wght@400;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="tailwind.js"></script>
+<script>
+    function initTailwind() {
+        if (typeof tailwind !== 'undefined') {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            primary: "#4f46e5", // Indigo-600
+                            accent: "#10b981", // Emerald/Green from the logo
+                            "background-light": "#f8fafc", // Slate-50
+                            "background-dark": "#0f172a", // Slate-900
+                        },
+                        fontFamily: {
+                            display: ["Orbitron", "sans-serif"],
+                            sans: ["Inter", "sans-serif"],
+                        },
+                        borderRadius: {
+                            DEFAULT: "1rem",
+                        },
+                    },
+                },
+            };
+        } else {
+            setTimeout(initTailwind, 50);
+        }
+    }
+    initTailwind();
+</script>
+<style>
+        .logo-glow {
+            filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.4));
+        }
+        .bg-grid {
+            background-image: radial-gradient(circle, #e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .dark .bg-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+        }
+        .btn-shimmer {
+            background: linear-gradient(110deg, #4f46e5 45%, #6366f1 55%, #4f46e5 65%);
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col font-sans transition-colors duration-300">
+<div class="h-12 w-full"></div>
+<main class="flex-1 px-6 py-8 flex flex-col items-center max-w-md mx-auto w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-grid opacity-50 -z-10"></div>
+<div class="absolute top-[-10%] left-[-10%] w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+<div class="absolute bottom-[10%] right-[-10%] w-64 h-64 bg-accent/5 rounded-full blur-3xl -z-10"></div>
+<div class="mb-12 text-center">
+<div class="relative inline-block mb-4">
+    <img alt="Binary Game Logo" class="h-10 w-auto logo-glow object-contain dark:hidden" src="../Assets/logo/logo light.png"/>
+    <img alt="Binary Game Logo" class="h-10 w-auto logo-glow object-contain hidden dark:block" src="../Assets/logo/logo dark.png"/>
+</div>
+<p class="text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase text-xs">Strategy &amp; Intimacy</p>
+</div>
+<div class="w-full bg-white/70 dark:bg-slate-800/50 backdrop-blur-xl border border-slate-200 dark:border-slate-700 p-8 rounded-[2rem] shadow-2xl shadow-slate-200/50 dark:shadow-black/20">
+<h2 class="font-display text-xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-500 dark:from-white dark:to-slate-400">
+                PREPARE FOR BATTLE
+            </h2>
+<div class="space-y-6">
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-accent"></span>
+                        Player One
+                    </label>
+<div class="relative">
+<span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">person</span>
+<input id="p1-input" class="w-full bg-slate-100 dark:bg-slate-900/50 border-none rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-semibold" placeholder="Enter name..." type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+                        Player Two
+                    </label>
+<div class="relative">
+<span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">person_outline</span>
+<input id="p2-input" class="w-full bg-slate-100 dark:bg-slate-900/50 border-none rounded-2xl py-4 pl-12 pr-4 focus:ring-2 focus:ring-primary/50 transition-all text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 font-semibold" placeholder="Enter name..." type="text"/>
+</div>
+</div>
+<button id="main-action-btn" class="w-full bg-indigo-600 text-white font-display font-black py-5 rounded-2xl shadow-lg shadow-indigo-500/30 active:scale-95 transition-transform flex items-center justify-center gap-3 mt-4 btn-shimmer" onclick="handleMainAction()">
+                    ENTER THE ARENA
+                    <span class="material-icons">bolt</span>
+</button>
+</div>
+</div>
+<div class="mt-8 flex flex-col items-center gap-4">
+<div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700">
+<span class="material-icons text-accent text-sm">videocam</span>
+<p class="text-[10px] md:text-xs text-slate-600 dark:text-slate-400 font-medium">
+                    Camera access required for AI-driven expression sync
+                </p>
+</div>
+</div>
+</main>
+<!-- Settings Modal -->
+<div id="settings-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl p-6 shadow-2xl border border-slate-200 dark:border-slate-700 transform scale-95 transition-transform duration-300" id="settings-card">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-display font-bold text-xl">Settings</h3>
+            <button onclick="toggleSettings()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                <span class="material-icons text-sm">close</span>
+            </button>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-widest">Hugging Face Token</label>
+                <input id="api-key-input" type="password" placeholder="hf_..." class="w-full bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary outline-none transition-all">
+                <p class="text-[10px] text-slate-400">Your token is stored locally. Ensure it has 'Read' permissions.</p>
+            </div>
+        </div>
+
+        <button onclick="saveSettings()" style="background-color: #10b981 !important; color: white !important;" class="w-full mt-6 font-bold py-3 rounded-xl shadow-lg active:scale-95 transition-all">
+            SAVE SETTINGS
+        </button>
+    </div>
+</div>
+
+<footer class="p-8 text-center">
+<div class="flex justify-center gap-6 mb-4">
+<button class="text-slate-400 dark:text-slate-600 hover:text-primary transition-colors">
+<span class="material-icons">help_outline</span>
+</button>
+<button onclick="toggleSettings()" class="text-slate-400 dark:text-slate-600 hover:text-primary transition-colors">
+<span class="material-icons">settings</span>
+</button>
+<button class="text-slate-400 dark:text-slate-600 hover:text-primary transition-colors">
+<span class="material-icons">share</span>
+</button>
+</div>
+<p class="text-[10px] text-slate-400 dark:text-slate-600 font-bold tracking-tighter uppercase font-display">
+            BINARY SYSTEM v2.0.4-BETA
+        </p>
+</footer>
+<button class="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-white dark:bg-slate-800 shadow-xl flex items-center justify-center border border-slate-200 dark:border-slate-700" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-icons text-slate-800 dark:text-yellow-400">dark_mode</span>
+</button>
+<script src="game.js"></script>
+<script>
+    function checkApiKey() {
+        const key = localStorage.getItem('binary_hf_token');
+        const btn = document.getElementById('main-action-btn');
+        
+        if (key && key.trim().length > 0) {
+            // Key exists -> Ready to play
+            btn.innerHTML = `ENTER THE ARENA <span class="material-icons">bolt</span>`;
+            btn.classList.remove('bg-rose-500', 'shadow-rose-500/30');
+            btn.classList.add('bg-indigo-600', 'shadow-indigo-500/30');
+        } else {
+            // No key -> Setup required
+            btn.innerHTML = `SETUP API KEY <span class="material-icons">settings</span>`;
+            btn.classList.remove('bg-indigo-600', 'shadow-indigo-500/30');
+            btn.classList.add('bg-rose-500', 'shadow-rose-500/30');
+        }
+    }
+
+    // Check on load
+    checkApiKey();
+
+    function handleMainAction() {
+        const key = localStorage.getItem('binary_hf_token');
+        if (key && key.trim().length > 0) {
+            startGame();
+        } else {
+            toggleSettings();
+        }
+    }
+
+    function toggleSettings() {
+        const modal = document.getElementById('settings-modal');
+        const card = document.getElementById('settings-card');
+        const isHidden = modal.classList.contains('opacity-0');
+        
+        if (isHidden) {
+            // Open
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+            // Load existing key
+            document.getElementById('api-key-input').value = localStorage.getItem('binary_hf_token') || '';
+        } else {
+            // Close
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.remove('scale-100');
+            card.classList.add('scale-95');
+        }
+    }
+
+    function saveSettings() {
+        const key = document.getElementById('api-key-input').value.trim();
+        if (key) {
+            localStorage.setItem('binary_hf_token', key);
+            // Visual feedback
+            const btn = document.querySelector('#settings-card > button');
+            const originalText = btn.innerText;
+            const originalBg = btn.style.backgroundColor;
+            
+            btn.innerText = "SAVED!";
+            btn.style.backgroundColor = "#059669"; // Darker emerald
+            
+            // Update main button state immediately
+            checkApiKey();
+
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.backgroundColor = originalBg;
+                toggleSettings();
+            }, 1000);
+        } else {
+             alert("Please enter a valid Token.");
+        }
+    }
+
+    function startGame() {
+        const p1 = document.getElementById('p1-input').value;
+        const p2 = document.getElementById('p2-input').value;
+        if (!p1 || !p2) {
+            alert("Both players must enter their identity to proceed.");
+            return;
+        }
+        GameEngine.savePlayers(p1, p2);
+        window.location.href = 'toss.html';
+    }
+</script>
+
+</body></html>
