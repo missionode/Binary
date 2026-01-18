@@ -308,63 +308,73 @@
         async function performAnalysis() {
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             title.innerText = "AI Processing...";
-            desc.innerText = "Stitching & Analyzing...";
+            desc.innerText = "Analyzing Biometric & Environmental Data...";
             btn.classList.add('hidden');
-            document.querySelector('p.animate-pulse').innerText = "Analyzing via Llama 3.2 Vision...";
+            document.querySelector('p.animate-pulse').innerText = "Gemini AI Analyzing...";
 
             let percentage = 0;
             let bias = "Stable";
 
             if (apiKey && p1Data && p2Data && envData) {
                 try {
-                    const stitchedDataUrl = await stitchImages(p1Data, p2Data, envData);
-                    const systemPrompt = `You are the Game Master. Analyze this composite image (Left: P1, Center: P2, Right: Env). 1. Analyze Faces (Physiognomy). 2. Analyze Environment (Props/Safety). 3. Generate 10 CUSTOM CHALLENGES (5 for P1, 5 for P2). OUTPUT JSON ONLY: {"percentage": number, "bias": string, "challenges": [{"title":string, "desc":string, "icon":string, "assignee":"P1"|"P2"}]}`;
+                    // System Prompt for Gemini
+                    const systemPrompt = `
+                    You are the Game Master for an intimate couples' game.
                     
-                // 3. Call Hugging Face API
-                console.log("Calling HF API with token length:", apiKey.length);
-                
-                const response = await fetch("https://api-inference.huggingface.co/models/meta-llama/Llama-3.2-11B-Vision-Instruct", {
-                    method: "POST",
-                    mode: "cors", // Explicitly request CORS
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        messages: [
-                            {
-                                role: "user",
-                                content: [
-                                    { type: "text", text: systemPrompt },
-                                    { type: "image_url", image_url: { url: stitchedDataUrl } }
+                    INPUTS:
+                    1. Image 1: Player 1 (Face)
+                    2. Image 2: Player 2 (Face)
+                    3. Image 3: Environment/Context
+                    
+                    TASKS:
+                    1. Analyze Faces (Physiognomy/Samudrika Shastra): Assess personality traits (energy, dominance, openness).
+                    2. Analyze Environment: Is it public/private? Safe/unsafe? Detect props (chairs, pillows, etc.).
+                    3. Generate 10 CUSTOM CHALLENGES (5 for P1, 5 for P2).
+                       - PUBLIC/UNSAFE env -> Verbal/Subtle challenges.
+                       - PRIVATE/SAFE env -> Physical/Intimate challenges.
+                       - Use props if detected.
+                    
+                    OUTPUT JSON ONLY:
+                    {
+                        "percentage": number (0-100),
+                        "bias": string (one word),
+                        "challenges": [
+                            { "title": string, "desc": string, "icon": string (Material Icon name), "assignee": "P1" or "P2" }
+                        ]
+                    }`;
+
+                    // Call Gemini API (v1beta/gemini-1.5-flash)
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [
+                                    { text: systemPrompt },
+                                    { inline_data: { mime_type: "image/jpeg", data: p1Data } },
+                                    { inline_data: { mime_type: "image/jpeg", data: p2Data } },
+                                    { inline_data: { mime_type: "image/jpeg", data: envData } }
                                 ]
-                            }
-                        ],
-                        max_tokens: 1000
-                    })
-                });
+                            }]
+                        })
+                    });
 
                     if (!response.ok) {
-                        const errText = await response.text();
-                        throw new Error(`HF Error ${response.status}: ${errText}`);
+                        const errData = await response.json();
+                        throw new Error(`Gemini Error ${response.status}: ${errData.error?.message || response.statusText}`);
                     }
 
                     const data = await response.json();
-                    console.log("HF Raw Response:", data);
-                    
-                    let text = "";
-                    if (data.choices && data.choices[0] && data.choices[0].message) {
-                        text = data.choices[0].message.content;
-                    } else if (Array.isArray(data) && data[0].generated_text) {
-                         text = data[0].generated_text;
-                    } else {
-                         text = JSON.stringify(data);
+                    console.log("Gemini Raw Response:", data);
+
+                    if (!data.candidates || !data.candidates[0] || !data.candidates[0].content) {
+                        throw new Error("AI Safety Block or Empty Response");
                     }
 
-                    const jsonMatch = text.match(/\{[\s\S]*\}/);
-                    if (!jsonMatch) throw new Error("No JSON found in AI response");
+                    const text = data.candidates[0].content.parts[0].text;
+                    const cleanText = text.replace(/```json|```/g, '').trim();
+                    const result = JSON.parse(cleanText);
                     
-                    const result = JSON.parse(jsonMatch[0]);
                     percentage = result.percentage;
                     bias = result.bias;
                     if (result.challenges) GameEngine.setAIChallenges(result.challenges);
